@@ -2,3 +2,4 @@
 wxWebServer/.idea/
 wxWebServer/conf/
 *.pyc
+.gitignore
