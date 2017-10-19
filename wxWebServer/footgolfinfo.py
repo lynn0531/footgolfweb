@@ -1,9 +1,10 @@
 #coding:UTF-8
 # filename: footgolfinfo.py
-import MySQLdb
-from utility.configInfo import ConfigInfo
 from utility.mysqlaccess import MysqlAccessBase
 import abc
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 class footgolfInfoBase(): #abstract class
     __metaclass__ = abc.ABCMeta
