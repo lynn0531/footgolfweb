@@ -20,5 +20,5 @@ class UserMsg(object):
             mysqlAccess.close()
             print "连接已关闭"
 # test
-um = UserMsg()
-um.recordUserTxtMsgLog("abc","abc","123123","text","haha test 2")
+# um = UserMsg()
+# um.recordUserTxtMsgLog("abc","abc","123123","text","haha test 2")
