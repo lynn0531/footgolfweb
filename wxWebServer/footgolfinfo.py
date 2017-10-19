@@ -105,7 +105,7 @@ class FootgolferInfoByGame(footgolfInfoBase):
         if count <= 0:
             resultTxt += "\n" + "没有此比赛数据，目前仅支持【2017轻井泽】。"
         return resultTxt
-    
+
 class FootgolferInfo(object):
     def getRankInfo(self, keyword):
         info = None
@@ -119,5 +119,5 @@ class FootgolferInfo(object):
         return result
 
 # test
-#fi = FootgolferInfo()
-#fi.getRankInfo("zheng")
+# fi = FootgolferInfo()
+# fi.getRankInfo("zheng")
