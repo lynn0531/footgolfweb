@@ -125,5 +125,5 @@ class FootgolferInfo(object):
         return result
 
 # test
-fi = FootgolferInfo()
-fi.getRankInfo("中国")
+#fi = FootgolferInfo()
+#fi.getRankInfo("中国")
