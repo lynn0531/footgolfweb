@@ -41,12 +41,14 @@ class FootgolferInfoByName(footgolfInfoBase):
     def getQuerySql(self, keyWord):
         #playerName = keyWord.lower().replace('，', ',').replace(',', '').replace(' ', '').replace(' ', '')
         #print playerName
-        queryRankSql = "select fr.name,fr.chinaname,fr.fifgmember,fr.rank,fr.point,fr.updatetime from footgolfer_rank fr where replace(replace(fr.name,',',''),' ','') like %s;"
+        queryRankSql = "select fr.name,fr.chinaname,fr.fifgOrg,fr.ranking,fr.score,fr.updatetime from footgolfer_rank fr where replace(replace(fr.name,',',''),' ','') like %s order by fr.ranking;"
         return queryRankSql
     def getOutputData(self, dataSet):
         infoList = []
         count = 0
         resultTxt = ""
+        if len(dataSet) > 0: #有数据 显示数据更新时间
+            resultTxt += "数据更新时间：" + str(dataSet[0][5])
         for i in dataSet:
             temp = "排:" + str(i[3]) + " 名:" + str(i[0]) + " 分:" + str(i[4])
             print temp
@@ -65,12 +67,15 @@ class FootgolferInfoByName(footgolfInfoBase):
 
 class FootgolferInfoByCountry(footgolfInfoBase):
     def getQuerySql(self, keyWord):
-        queryRankSql = "select fr.name,fr.chinaname,fr.fifgmember,fr.rank,fr.point,fr.updatetime from footgolfer_rank fr where fr.fifgmember = 'China FootGolf Association' order by fr.rank;"
+        queryRankSql = "select fr.name,fr.chinaname,fr.fifgOrg,fr.ranking,fr.score,fr.updatetime from footgolfer_rank fr where fr.fifgOrg = 'China FootGolf Association' order by fr.ranking;"
         return queryRankSql
     def getOutputData(self, dataSet):
         infoList = []
         count = 0
-        resultTxt = "中国选手排名如下："
+        resultTxt = ""
+        if len(dataSet) > 0: #有数据 显示数据更新时间
+            resultTxt += "数据更新时间：" + str(dataSet[0][5])
+        resultTxt += "\n中国选手排名如下："
         for i in dataSet:
             temp = "中:" + str(count + 1) + " 世:" + str(i[3]) + " 名:" + str(i[0]) + " 分:" + str(i[4])
             print temp
@@ -87,7 +92,7 @@ class FootgolferInfoByCountry(footgolfInfoBase):
 
 class FootgolferInfoByGame(footgolfInfoBase):
     def getQuerySql(self, keyWord):
-        queryRankSql =  "select fr.name,fr.chinaname,fr.fifgmember,fr.rank,fr.point,fr.updatetime from footgolfer_rank fr,footgolfer_karuizawa2017 fk7 where fr.name = fk7.name order by fr.rank;"
+        queryRankSql =  "select fr.name,fr.chinaname,fr.fifgOrg,fr.ranking,fr.score,fr.updatetime from footgolfer_rank fr,footgolfer_karuizawa2017 fk7 where fr.name = fk7.name order by fr.ranking;"
         return queryRankSql
     def getOutputData(self, dataSet):
         infoList = []
@@ -120,5 +125,5 @@ class FootgolferInfo(object):
         return result
 
 # test
-# fi = FootgolferInfo()
-# fi.getRankInfo("zheng")
+fi = FootgolferInfo()
+fi.getRankInfo("中国")

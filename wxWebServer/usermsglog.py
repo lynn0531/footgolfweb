@@ -12,7 +12,11 @@ class UserMsg(object):
             insertSql = "insert into user_msg (msgid,wxuserid,msgtime,msgtype,msgcontent,create_time) values (%s,%s,%s,%s,%s,%s);"
             sqlParam = [msgid, userid, int(msgtime), msgtype, msgcontent, ctime]
             print insertSql
-            mysqlAccess.update(insertSql, sqlParam)
+            updateResult = mysqlAccess.update(insertSql, sqlParam)
+            if updateResult:
+                mysqlAccess.commit()
+            else:
+                mysqlAccess.rollback()
             print "message log update success."
         except Exception, Argment:
             print "error:" + str(Argment)

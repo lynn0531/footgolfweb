@@ -24,7 +24,6 @@ class MysqlAccessBase(object):
         try:
             if self.connFlg:
                 self.cursor.execute(sql, sqlParam)
-                self.conn.commit()
                 updateFlg = True
         except MySQLdb.Error as e:
             self.conn.rollback()
@@ -32,6 +31,49 @@ class MysqlAccessBase(object):
             print ("Mysql Error: %s %s" % (e.args[0], e.args[1]))
         finally:
             return updateFlg
+
+    # 批量更新数据
+    def updateMany(self, sql, sqlParams):
+        updateManyFlg = False
+        try:
+            if self.connFlg:
+                self.cursor.executemany(sql, sqlParams)
+                updateManyFlg = True
+        except MySQLdb.Error as e:
+            self.conn.rollback()
+            updateManyFlg = False
+            print ("Mysql Error: %s %s" % (e.args[0], e.args[1]))
+        finally:
+            return updateManyFlg
+
+    # 变更提交
+    def commit(self):
+        commitFlg = False
+        try:
+            if self.connFlg:
+                self.conn.commit()
+                commitFlg = True
+        except MySQLdb.Error as e:
+            self.conn.rollback()
+            commitFlg = False
+            print ("Mysql Error: %s %s" % (e.args[0], e.args[1]))
+        finally:
+            return commitFlg
+
+    # 变更回滚
+    def rollback(self):
+        rollbackFlg = False
+        try:
+            if self.connFlg:
+                self.conn.rollback()
+                rollbackFlg = True
+        except MySQLdb.Error as e:
+            self.conn.rollback()
+            rollbackFlg = False
+            print ("Mysql Error: %s %s" % (e.args[0], e.args[1]))
+        finally:
+            return rollbackFlg
+
     # 获取数据集
     def query(self, sql, sqlParam):
         try:
