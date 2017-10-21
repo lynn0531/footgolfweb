@@ -25,7 +25,7 @@ class SaveInfoData(object):
         try:
             htmlContext = HTMLInfo().getHtmlFromUrl("https://fgranks.com/fifg/worldtour?l=en")  # 获取页面html数据
             dataSet = FIFGRankInfo().parseRankHtmlData(htmlContext) # 解析html生成排名数据
-            print dataSet["result"]
+            # print dataSet["result"]
             if int(dataSet["result"]) < 0:
                 return "error"
             ctime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -47,7 +47,7 @@ class SaveInfoData(object):
                 param.append(temp["sysId"])
                 param.append(ctime)
                 sqlParams.append(param)
-            print sqlParams
+            # print sqlParams
             mysqlOb.updateMany(sql,sqlParams) # 插入球员信息
 
             # 更新履历
@@ -67,4 +67,4 @@ class SaveInfoData(object):
 
 
 # test
-SaveInfoData().saveFootgolfRankData()
+# SaveInfoData().saveFootgolfRankData()
