@@ -77,14 +77,15 @@ class SaveGameInfoData(object):
                     unitParam.append(cdate)
                     unitParam.append(ctime)
                     gameResultParams.append(unitParam)
+                    print gameResultParams
+                    mysqlOb.updateMany(gameResultInfoSql, gameResultParams)
+
 
             # print sqlParams
             gameInfoFlg = mysqlOb.updateMany(gameInfoSql, sqlGameInfoParams) # 插入球员信息
             if gameInfoFlg == False:
                 raise Exception("game list get error.")
-            gameResultFlg = mysqlOb.updateMany(gameResultInfoSql,gameResultParams)
-            if gameResultFlg == False:
-                raise  Exception("game reslut get error.")
+
 
             mysqlOb.commit()
             print "footgolf game Info update success."
@@ -98,4 +99,4 @@ class SaveGameInfoData(object):
 
 
 # test
-#SaveInfoData().saveFootgolfGamesData()
+#SaveGameInfoData().saveFootgolfGamesData()

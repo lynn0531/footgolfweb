@@ -40,9 +40,10 @@ class MysqlAccessBase(object):
                 self.cursor.executemany(sql, sqlParams)
                 updateManyFlg = True
         except MySQLdb.Error as e:
-            self.conn.rollback()
+            # self.conn.rollback()
             updateManyFlg = False
             print ("Mysql Error: %s %s" % (e.args[0], e.args[1]))
+            raise ("Mysql Error: %s %s" % (e.args[0], e.args[1]))
         finally:
             return updateManyFlg
 
