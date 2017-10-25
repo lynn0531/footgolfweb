@@ -38,7 +38,7 @@ class SaveGameInfoData(object):
                                 "round3,round4,round5,topar,total,updatetime,create_time) " \
                                 "values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
             sqlGameInfoParams = []
-            gameResultParams = []
+
             index = 0
             for temp in dataSet["gameInfo"]:
                 index += 1
@@ -59,6 +59,8 @@ class SaveGameInfoData(object):
                 gameResultData = fifgGameInfo.parseGameRankInfo(gameRankContext)
                 if int(gameResultData["result"]) < 0:
                     raise Exception("game result data get error.")
+
+                gameResultParams = []
                 for resultTemp in gameResultData["gameResultInfo"]:
                     unitParam = []
                     unitParam.append(gameId)
