@@ -80,9 +80,7 @@ class SaveGameInfoData(object):
                     unitParam.append(ctime)
                     gameResultParams.append(unitParam)
                     print gameResultParams
-                    mysqlOb.updateMany(gameResultInfoSql, gameResultParams)
-
-
+                mysqlOb.updateMany(gameResultInfoSql, gameResultParams)
             # print sqlParams
             gameInfoFlg = mysqlOb.updateMany(gameInfoSql, sqlGameInfoParams) # 插入球员信息
             if gameInfoFlg == False:
