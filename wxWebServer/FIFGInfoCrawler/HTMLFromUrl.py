@@ -9,3 +9,6 @@ class HTMLInfo(object):
 
         # print htmlInfo
         return htmlInfo
+
+# test
+# print HTMLInfo().getHtmlFromUrl('https://fgranks.com/fifg/torneos/austria-international-austrian-footgolf-open')
