@@ -51,6 +51,7 @@ class SaveGameInfoData(object):
                 param.append(cdate)
                 param.append(ctime)
                 sqlGameInfoParams.append(param)
+                print str(temp["gameName"])
 
                 # get game reslut info data
                 gameRankContext = HTMLInfo().getHtmlFromUrl(str(temp["gamePageLink"]))
@@ -78,11 +79,12 @@ class SaveGameInfoData(object):
                     gameResultParams.append(unitParam)
 
             # print sqlParams
-            mysqlOb.updateMany(gameInfoSql, sqlGameInfoParams) # 插入球员信息
-            mysqlOb.updateMany(gameResultInfoSql,gameResultParams)
-
-
-
+            gameInfoFlg = mysqlOb.updateMany(gameInfoSql, sqlGameInfoParams) # 插入球员信息
+            if gameInfoFlg == False:
+                raise Exception("game list get error.")
+            gameResultFlg = mysqlOb.updateMany(gameResultInfoSql,gameResultParams)
+            if gameResultFlg == False:
+                raise  Exception("game reslut get error.")
 
             mysqlOb.commit()
             print "footgolf game Info update success."
