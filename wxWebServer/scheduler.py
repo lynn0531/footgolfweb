@@ -13,5 +13,5 @@ def updateGameInfoJob():
 if __name__ == '__main__':
     sched = BlockingScheduler()
     sched.add_job(myJob, 'cron', day_of_week='mon-sun', hour='3', minute="1", second="*/60")
-    sched.add_job(updateGameInfoJob, 'cron', day_of_week='mon-sun', hour='4', minute="1", second="*/60")
+    sched.add_job(updateGameInfoJob, 'cron', day_of_week='sun', hour='4', minute="1", second="*/60")
     sched.start()
