@@ -44,18 +44,41 @@ class FIFGGameInfo(object):
             return result
 
     def parseGameRankInfo(self, content):
-        thCount = 9  # 常量刨除round的列数
-        noToparCount = 8
         #content = open("/Users/lynn/程序开发/python/data/footgolfGameInfoData.html", 'r')  # TODO 替换
         soup = BeautifulSoup(content, "lxml")
         result = {}
         try:
             gameRankTable = soup.find('table',id="ranking_individual") # 赛事排名
+            titleKeyValue = {}
+            ths = gameRankTable.find_all("th")
+            thIndex = 0
+            for thTemp in ths:
+                if thTemp.string == "Pos.":
+                    titleKeyValue["pos"] = thIndex
+                elif thTemp.string == "TOUR":
+                    titleKeyValue["tour"] = thIndex
+                elif thTemp.string == "Name":
+                    titleKeyValue["name"] = thIndex
+                elif thTemp.string == "Totals":
+                    titleKeyValue["totals"] = thIndex
+                elif thTemp.string == "To Par":
+                    titleKeyValue["topar"] = thIndex
+                elif thTemp.string == "Round 1":
+                    titleKeyValue["round1"] = thIndex
+                elif thTemp.string == "Round 2":
+                    titleKeyValue["round2"] = thIndex
+                elif thTemp.string == "Round 3":
+                    titleKeyValue["round3"] = thIndex
+                thIndex += 1
+            roundCount = 0
+            for roundIndex in range(1,4):
+                if titleKeyValue.has_key("round" + str(roundIndex)):
+                    roundCount += 1
+
+            print titleKeyValue
+            print roundCount
+
             toparTh = gameRankTable.find("th",text="To Par")
-            if toparTh == None:
-                roundCount = len(gameRankTable.find_all('th')) - noToparCount  # 计算比赛轮数s
-            else:
-                roundCount = len(gameRankTable.find_all('th')) - thCount  # 计算比赛轮数s
             # print "roundCount: " + str(roundCount)
 
             individualRankTR = gameRankTable.tbody.find_all("tr", attrs={"data-tipo": 'jugador'})
@@ -67,25 +90,48 @@ class FIFGGameInfo(object):
                 #tdText = "" + trTemp['data-id'] + ";"
                 memberRankInfo["fifgId"] = trTemp['data-id']
 
-                memberRankInfo["pos"] = tds[1].string
-                # memberRankInfo["memImageUrl"] = tds[3].string
-                # memberRankInfo["countryIconUrl"] = tds[4].string
-                memberRankInfo["name"] = tds[5].string
-                tourTemp = tds[4].find('img')
-                if tourTemp == None:
-                    memberRankInfo["tour"] = None
+                if titleKeyValue.has_key("pos"):
+                    memberRankInfo["pos"] = tds[int(titleKeyValue["pos"])].string
                 else:
-                    memberRankInfo["tour"] = "1"
+                    memberRankInfo["pos"] = None
+                    # memberRankInfo["memImageUrl"] = tds[3].string
+                # memberRankInfo["countryIconUrl"] = tds[4].string
+                if titleKeyValue.has_key("name"):
+                    memberRankInfo["name"] = tds[int(titleKeyValue["name"])].string
+                else:
+                    memberRankInfo["name"] = None
+                if titleKeyValue.has_key("tour"):
+                    tourTemp = tds[int(titleKeyValue["tour"])].find('img')
+                    if tourTemp == None:
+                        memberRankInfo["tour"] = None
+                    else:
+                        memberRankInfo["tour"] = "1"
+                else:
+                    memberRankInfo["tour"] = None
 
                 # set round data
-                for i in range(1,roundCount + 1):
-                    memberRankInfo["round" + str(i)] = tds[6 + i].string
-                memberRankInfo["total"] = tds[6 + roundCount + 1].string
-                if toparTh == None:
-                    memberRankInfo["topar"] = None
+                if titleKeyValue.has_key("round1"):
+                    memberRankInfo["round1"] = tds[int(titleKeyValue["round1"])].string
                 else:
-                    memberRankInfo["topar"] = tds[6 + roundCount + 2].string
+                    memberRankInfo["round1"] = None
+                if titleKeyValue.has_key("round2"):
+                    memberRankInfo["round2"] = tds[int(titleKeyValue["round2"])].string
+                else:
+                    memberRankInfo["round2"] = None
+                if titleKeyValue.has_key("round3"):
+                    memberRankInfo["round3"] = tds[int(titleKeyValue["round3"])].string
+                else:
+                    memberRankInfo["round3"] = None
+                if titleKeyValue.has_key("totals"):
+                    memberRankInfo["total"] = tds[int(titleKeyValue["totals"])].string
+                else:
+                    memberRankInfo["total"] = None
+                if titleKeyValue.has_key("topar"):
+                    memberRankInfo["topar"] = tds[int(titleKeyValue["topar"])].string
+                else:
+                    memberRankInfo["topar"] = None
                 memberRankInfo["roundCount"] = roundCount
+
                 rankInfoList.append(memberRankInfo)
 
             result["result"] = 0
@@ -222,7 +268,8 @@ class FIFGGameInfo(object):
 
 
 # test
-#print FIFGGameInfo().parseGameRankInfo("")
+#content = open("/Users/lynn/程序开发/python/data/footgolfGameInfoData_japan.html", 'r')
+#print FIFGGameInfo().parseGameRankInfo(content)
 
 
 #content = open("/Users/lynn/程序开发/python/data/popup1.html", 'r')  # TODO 替换
