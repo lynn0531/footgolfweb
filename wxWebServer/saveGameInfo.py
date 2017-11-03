@@ -54,7 +54,7 @@ class SaveGameInfoData(object):
                 print str(temp["gameName"])
 
                 # get game reslut info data
-                gameRankContext = HTMLInfo().getHtmlFromUrl(str(temp["gamePageLink"]))
+                gameRankContext = HTMLInfo().getHtmlFromUrl(str(temp["gamePageLink"]) + "?l=en")
 
                 gameResultData = fifgGameInfo.parseGameRankInfo(gameRankContext)
                 if int(gameResultData["result"]) < 0:
@@ -79,7 +79,7 @@ class SaveGameInfoData(object):
                     unitParam.append(cdate)
                     unitParam.append(ctime)
                     gameResultParams.append(unitParam)
-                    print gameResultParams
+                    #print gameResultParams
                 mysqlOb.updateMany(gameResultInfoSql, gameResultParams)
             # print sqlParams
             gameInfoFlg = mysqlOb.updateMany(gameInfoSql, sqlGameInfoParams) # 插入球员信息
@@ -96,6 +96,109 @@ class SaveGameInfoData(object):
         finally:
             mysqlOb.close()
             print "DB连接关闭"
+
+    def savePlayerResultInfo(self):
+        mysqlOb = MysqlAccessBase()
+        try:
+            fifgGameInfo = FIFGGameInfo()
+            numStr = NumStrUtil()
+
+            dataSet = fifgGameInfo.parseGamePlayerWholeResult("","")  # 解析html生成排名数据
+
+            if int(dataSet["result"]) < 0:
+                raise Exception("play whole result list get error.")
+            ctime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            cdate = datetime.datetime.now().strftime("%Y-%m-%d")
+
+            #self.deleteOldData(mysqlOb)  todo 改成球员赛事结果删除方法
+
+            gameInfoSql = "insert into footgolf_info.footgolf_gameInfo " \
+                          "(game_id,game_name,game_level,game_link,updatetime,create_time) values " \
+                          "(%s,%s,%s,%s,%s,%s);"
+            gameResultInfoSql = "insert into footgolf_info.footgolf_gameResultInfo " \
+                                "(game_id,fifg_id,player_name,pos,round_count,round1,round2," \
+                                "round3,round4,round5,topar,total,updatetime,create_time) " \
+                                "values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
+            sqlGameInfoParams = []
+
+            index = 0
+            for temp in dataSet["gameInfo"]:
+                index += 1
+                param = []
+                gameId = "game" + str(index)
+                param.append(gameId)  # game id
+                param.append(temp["gameName"])  # game name
+                param.append(temp["gameLevel"])  # game level
+                param.append(temp["gamePageLink"])  # game page link
+                param.append(cdate)
+                param.append(ctime)
+                sqlGameInfoParams.append(param)
+                print str(temp["gameName"])
+
+                # get game reslut info data
+                gameRankContext = HTMLInfo().getHtmlFromUrl(str(temp["gamePageLink"]))
+
+                gameResultData = fifgGameInfo.parseGameRankInfo(gameRankContext)
+                if int(gameResultData["result"]) < 0:
+                    raise Exception("game result data get error.")
+
+                gameResultParams = []
+                for resultTemp in gameResultData["gameResultInfo"]:
+                    unitParam = []
+                    unitParam.append(gameId)
+                    unitParam.append(resultTemp["fifgId"])
+                    unitParam.append(resultTemp["name"])
+                    unitParam.append(resultTemp["pos"])
+                    roundCount = int(resultTemp["roundCount"])
+                    unitParam.append(str(roundCount))
+                    for roundIdx in range(1, 6):
+                        if roundIdx <= roundCount:  # 该比赛轮次内
+                            unitParam.append(numStr.convertToInt(resultTemp["round" + str(roundIdx)], None))
+                        else:
+                            unitParam.append(None)
+                    unitParam.append(numStr.convertToInt(resultTemp["topar"], None))
+                    unitParam.append(numStr.convertToInt(resultTemp["total"], None))
+                    unitParam.append(cdate)
+                    unitParam.append(ctime)
+                    gameResultParams.append(unitParam)
+                    print gameResultParams
+                mysqlOb.updateMany(gameResultInfoSql, gameResultParams)
+            # print sqlParams
+            gameInfoFlg = mysqlOb.updateMany(gameInfoSql, sqlGameInfoParams)  # 插入球员信息
+            if gameInfoFlg == False:
+                raise Exception("game list get error.")
+
+            mysqlOb.commit()
+            print "footgolf game Info update success."
+        except Exception, Argment:
+            mysqlOb.rollback()
+            print "game info update error:" + str(Argment)
+            print "已回滚"
+        finally:
+            mysqlOb.close()
+            print "DB连接关闭"
+
+    def getGameId(self, gameName):
+        mysqlAccess = MysqlAccessBase()
+        try:
+            querySql = "select gi.game_id,gi.game_name from footgolf_info.footgolf_gameInfo gi " \
+                       "where gi.game_name like %s;"
+            queryData = mysqlAccess.query(querySql, '%' + gameName + "%")
+            resultTxt = self.getOutputData(queryData)
+            infoList = []
+            count = 0
+            resultTxt = ""
+            if len(resultTxt) > 0:  # 有数据 显示数据更新时间
+                print resultTxt[0][0]
+                return resultTxt[0][0]
+
+            return None
+        except Exception, Argment:
+            print "error:" + str(Argment)
+            return None
+        finally:
+            mysqlAccess.close()
+            print "连接已关闭"
 
 
 # test
