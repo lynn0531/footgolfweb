@@ -45,12 +45,17 @@ class FIFGGameInfo(object):
 
     def parseGameRankInfo(self, content):
         thCount = 9  # 常量刨除round的列数
+        noToparCount = 8
         #content = open("/Users/lynn/程序开发/python/data/footgolfGameInfoData.html", 'r')  # TODO 替换
         soup = BeautifulSoup(content, "lxml")
         result = {}
         try:
             gameRankTable = soup.find('table',id="ranking_individual") # 赛事排名
-            roundCount = len(gameRankTable.find_all('th')) - thCount  # 计算比赛轮数s
+            toparTh = gameRankTable.find("th",text="To Par")
+            if toparTh == None:
+                roundCount = len(gameRankTable.find_all('th')) - noToparCount  # 计算比赛轮数s
+            else:
+                roundCount = len(gameRankTable.find_all('th')) - thCount  # 计算比赛轮数s
             # print "roundCount: " + str(roundCount)
 
             individualRankTR = gameRankTable.tbody.find_all("tr", attrs={"data-tipo": 'jugador'})
@@ -76,7 +81,10 @@ class FIFGGameInfo(object):
                 for i in range(1,roundCount + 1):
                     memberRankInfo["round" + str(i)] = tds[6 + i].string
                 memberRankInfo["total"] = tds[6 + roundCount + 1].string
-                memberRankInfo["topar"] = tds[6 + roundCount + 2].string
+                if toparTh == None:
+                    memberRankInfo["topar"] = None
+                else:
+                    memberRankInfo["topar"] = tds[6 + roundCount + 2].string
                 memberRankInfo["roundCount"] = roundCount
                 rankInfoList.append(memberRankInfo)
 
