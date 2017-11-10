@@ -36,4 +36,4 @@ class ImageMsg(Msg):
 class VoiceMsg(Msg):
     def __init__(self, xmlData):
         Msg.__init__(self, xmlData)
-        self.Content = xmlData.find('Recognition').text.encode("utf-8")
+        self.Content = xmlData.find('Recognition').text.encode("utf-8").rstrip('。')
