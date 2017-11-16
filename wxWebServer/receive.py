@@ -13,6 +13,8 @@ def parse_xml(web_data):
         return ImageMsg(xmlData)
     elif msg_type == 'voice':
         return VoiceMsg(xmlData)
+    elif msg_type == 'event':
+        return EventMsg(xmlData)
 
 class Msg(object):
     def __init__(self, xmlData):
@@ -37,3 +39,7 @@ class VoiceMsg(Msg):
     def __init__(self, xmlData):
         Msg.__init__(self, xmlData)
         self.Content = xmlData.find('Recognition').text.encode("utf-8").rstrip('。')
+class EventMsg(Msg):
+    def __init__(self, xmlData):
+        Msg.__init__(self, xmlData)
+        self.Event = xmlData.find('Event').text
