@@ -29,6 +29,7 @@ class Handle(object):
                 toUser = recMsg.FromUserName
                 fromUser = recMsg.ToUserName
                 event = recMsg.Event
+                print "event:" + event
                 welcomeMsg = "欢迎加入足球高尔夫公众号，下面为排名查询功能介绍：\n"\
                              "1.人名搜索:可输入姓名全拼进行搜索。如:wanglin \n" \
                              "2.特殊搜索:可以输入【中国】查询中国排名前30位的选手。目前仅支持中国。可语音输入。\n" \
