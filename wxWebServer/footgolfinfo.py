@@ -1,6 +1,7 @@
 #coding:UTF-8
 # filename: footgolfinfo.py
 from utility.mysqlaccess import MysqlAccessBase
+import utility.pinyinTrans
 import abc
 import sys
 reload(sys)
@@ -63,7 +64,9 @@ class FootgolferInfoByName(footgolfInfoBase):
             resultTxt += "\n" + "未找到数据，请核实姓名。\n1.人名搜索:可输入姓名全拼进行搜索。如:wanglin \n2.特殊搜索:可以输入【中国】查询中国排名前30位的选手。目前仅支持中国。\n特殊搜索：可以输入【2017轻井泽】查询2017日本轻井泽大师赛参赛高手。\n※排名信息暂时一周更新一次。\n如果有其他好的建议可以直接联系我。"
         return resultTxt
     def getSqlParam(self, keyWord):
-        return ["%" + keyWord.lower().replace('，', ',').replace(',', '').replace(' ', '').replace(' ', '') + "%"]
+        searchWord =  utility.pinyinTrans.to_pinyin(keyWord)
+        print "search key:" + searchWord
+        return ["%" + searchWord.lower().replace('，', ',').replace(',', '').replace(' ', '').replace(' ', '') + "%"]
 
 class FootgolferInfoByCountry(footgolfInfoBase):
     def getQuerySql(self, keyWord):
