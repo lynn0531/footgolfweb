@@ -69,6 +69,8 @@ class FIFGGameInfo(object):
                     titleKeyValue["round2"] = thIndex
                 elif thTemp.string == "Round 3":
                     titleKeyValue["round3"] = thIndex
+                elif thTemp.string == "Country":
+                    titleKeyValue["country"] = thIndex
                 thIndex += 1
             roundCount = 0
             for roundIndex in range(1,4):
@@ -130,6 +132,8 @@ class FIFGGameInfo(object):
                     memberRankInfo["topar"] = tds[int(titleKeyValue["topar"])].string
                 else:
                     memberRankInfo["topar"] = None
+                if titleKeyValue.has_key("country"):
+                    memberRankInfo["country"] = self.utilGetImgNameFromSrc(tds[int(titleKeyValue["country"])].find('img')['src'])
                 memberRankInfo["roundCount"] = roundCount
 
                 rankInfoList.append(memberRankInfo)
@@ -263,6 +267,12 @@ class FIFGGameInfo(object):
                 return temp.previous_sibling
             temp = temp.previous_sibling
         return None
+    def utilGetImgNameFromSrc(self,srcText):
+        if srcText == None or srcText == "":
+            return ""
+        srcGroups = srcText.split('/')
+        result = srcGroups[len(srcGroups) - 1].replace(".png","")
+        return result
 
 
 
@@ -274,3 +284,6 @@ class FIFGGameInfo(object):
 
 #content = open("/Users/lynn/程序开发/python/data/popup1.html", 'r')  # TODO 替换
 #FIFGGameInfo().parseGamePlayerWholeResult(content,"4943")
+
+#content = open("/Users/lynn/程序开发/python/data/footgolfGameInfoData.html", 'r')
+#print FIFGGameInfo().parseGameRankInfo(content)

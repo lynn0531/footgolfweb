@@ -8,6 +8,7 @@ import datetime
 
 
 class SaveGameInfoData(object):
+    gameCourseList = {}
     def deleteOldData(self, mysqlAccess):
         delGameInfoSql = "delete from footgolf_info.footgolf_gameInfo;"
         mysqlAccess.update(delGameInfoSql,None)
@@ -15,6 +16,7 @@ class SaveGameInfoData(object):
         mysqlAccess.update(delGameResultInfoSql, None)
         print "旧赛事数据已删除。"
 
+    # 比赛总成绩保存
     def saveFootgolfGamesData(self):
         mysqlOb = MysqlAccessBase()
         try:
@@ -34,9 +36,9 @@ class SaveGameInfoData(object):
                           "(game_id,game_name,game_level,game_link,updatetime,create_time) values " \
                           "(%s,%s,%s,%s,%s,%s);"
             gameResultInfoSql = "insert into footgolf_info.footgolf_gameResultInfo " \
-                                "(game_id,fifg_id,player_name,pos,round_count,round1,round2," \
+                                "(game_id,fifg_id,country,player_name,pos,round_count,round1,round2," \
                                 "round3,round4,round5,topar,total,updatetime,create_time) " \
-                                "values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
+                                "values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
             sqlGameInfoParams = []
 
             index = 0
@@ -65,6 +67,7 @@ class SaveGameInfoData(object):
                     unitParam = []
                     unitParam.append(gameId)
                     unitParam.append(resultTemp["fifgId"])
+                    unitParam.append(resultTemp["country"])
                     unitParam.append(resultTemp["name"])
                     unitParam.append(resultTemp["pos"])
                     roundCount = int(resultTemp["roundCount"])
@@ -97,6 +100,7 @@ class SaveGameInfoData(object):
             mysqlOb.close()
             print "DB连接关闭"
 
+    # 球员比赛每洞成绩保存
     def savePlayerResultInfo(self):
         mysqlOb = MysqlAccessBase()
         try:
@@ -112,9 +116,9 @@ class SaveGameInfoData(object):
 
             #self.deleteOldData(mysqlOb)  todo 改成球员赛事结果删除方法
 
-            gameInfoSql = "insert into footgolf_info.footgolf_gameInfo " \
-                          "(game_id,game_name,game_level,game_link,updatetime,create_time) values " \
-                          "(%s,%s,%s,%s,%s,%s);"
+            gameCourseInfoSql = "insert into footgolf_gameCourseInfo (game_id,course,par1,par2,par3,par4,par5,par6,par7," \
+                                "par8,par9,par10,par11,par12,par13,par14,par15,par16,par17,par18,update_time) " \
+                                "values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,);"
             gameResultInfoSql = "insert into footgolf_info.footgolf_gameResultInfo " \
                                 "(game_id,fifg_id,player_name,pos,round_count,round1,round2," \
                                 "round3,round4,round5,topar,total,updatetime,create_time) " \
@@ -122,7 +126,7 @@ class SaveGameInfoData(object):
             sqlGameInfoParams = []
 
             index = 0
-            for temp in dataSet["gameInfo"]:
+            for temp in dataSet["gamePlayerWholeResultInfo"]:
                 index += 1
                 param = []
                 gameId = "game" + str(index)
@@ -183,14 +187,11 @@ class SaveGameInfoData(object):
         try:
             querySql = "select gi.game_id,gi.game_name from footgolf_info.footgolf_gameInfo gi " \
                        "where gi.game_name like %s;"
-            queryData = mysqlAccess.query(querySql, '%' + gameName + "%")
-            resultTxt = self.getOutputData(queryData)
-            infoList = []
-            count = 0
-            resultTxt = ""
-            if len(resultTxt) > 0:  # 有数据 显示数据更新时间
-                print resultTxt[0][0]
-                return resultTxt[0][0]
+            queryData = mysqlAccess.query(querySql, ["%" + gameName.strip() + "%"])
+
+            if len(queryData) > 0:  # 有数据 显示数据更新时间
+                print queryData[0][0]
+                return queryData[0][0]
 
             return None
         except Exception, Argment:
@@ -200,6 +201,25 @@ class SaveGameInfoData(object):
             mysqlAccess.close()
             print "连接已关闭"
 
+    def hasGameCourseExist(self, gameId, course):
+        mysqlAccess = MysqlAccessBase()
+        try:
+            querySql = "select count(1) from footgolf_gameCourseInfo gci where gci.game_id = %s and gci.course = %s"
+            queryData = mysqlAccess.query(querySql, [gameId, course])
+
+            if len(queryData) > 0 and int(queryData[0][0]) > 0:  # 有数据 显示数据更新时间
+                print queryData[0][0]
+                return True
+            else:
+                return False
+
+        except Exception, Argment:
+            print "error:" + str(Argment)
+            return False
+        finally:
+            mysqlAccess.close()
+            print "连接已关闭"
+
 
 # test
-#SaveGameInfoData().saveFootgolfGamesData()
+#print SaveGameInfoData().getGameId("FIFG WORLD TOUR JAPAN FOOTGOLF INTERNATIONAL OPEN 2017 supported by Cygames ")
